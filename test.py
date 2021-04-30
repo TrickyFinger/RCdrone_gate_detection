@@ -6,36 +6,40 @@ import re
 from gate_detector import gate_detector_sampling, gate_detector_clustering
 import numpy as np
 
-
-dir = os.path.join(os.getcwd(), 'img_gates')
+# Sort images and put them in a list
+filedir = os.path.join(os.getcwd(), 'img_gates')
 image_type = 'png'
 image_names = []
-for file in os.listdir(dir):
+for file in os.listdir(filedir):
     if file.endswith(image_type) and file.startswith('img'):
-        image_names.append(os.path.join(dir, file))
+        image_names.append(os.path.join(filedir, file))
     image_names.sort(key=lambda f: int(re.sub('\D', '', f)))
-# loop over frames from the video stream
+
 idx = 0
 while idx < len(image_names):
-    img = cv2.imread(image_names[idx])
+    img_tmp = cv2.imread(image_names[idx])
     start = time.time()
 
-    [pt1, pt2, pt3, pt4] = gate_detector_clustering(image_names[idx])
-    gate_center = [int((pt1[0] + pt2[0] + pt3[0] + pt4[0]) / 4), int((pt1[1] + pt2[1] + pt3[1] + pt4[1]) / 4)]
+    pts = np.asarray(gate_detector_clustering(image_names[idx]))
 
-    # print(time.time() - start)
+    # Average the x, y of the corner points as the gate center
+    gate_center = [int(sum(pts[:, 0]) / len(pts)), int(sum(pts[:, 1]) / len(pts))]
+
+    # If the center moves too much from the previous one, we won't trust it. We then trust more the previous one.
+    prev_weight = 0.8     # Weight of the previous center
+    deviation_limit = 40  # Allowed deviation distance
     if idx > 0:
-        if np.sqrt((gate_center[0]-pre_gate_center[0])**2 + (gate_center[1]-pre_gate_center[1])**2) > 40:
-            gate_center[0] = int(0.2*gate_center[0] + 0.8*pre_gate_center[0])
-            gate_center[1] = int(0.2 * gate_center[1] + 0.8*pre_gate_center[1])
+        if np.sqrt((gate_center[0]-prev_gate_center[0])**2 + (gate_center[1]-prev_gate_center[1])**2) > deviation_limit:
+            gate_center[0] = int((1-prev_weight)*gate_center[0] + prev_weight*prev_gate_center[0])
+            gate_center[1] = int((1-prev_weight)*gate_center[1] + prev_weight*prev_gate_center[1])
 
-    img_tmp = cv2.circle(img, tuple(pt1), 10, (0, 0, 255), -1)
-    img_tmp = cv2.circle(img_tmp, tuple(pt2), 10, (0, 0, 255), -1)
-    img_tmp = cv2.circle(img_tmp, tuple(pt3), 10, (0, 0, 255), -1)
-    img_tmp = cv2.circle(img_tmp, tuple(pt4), 10, (0, 0, 255), -1)
+    # Draw everything for visualization
+    for pt in pts:
+        img_tmp = cv2.circle(img_tmp, tuple(pt), 10, (0, 0, 255), -1)
     img_tmp = cv2.circle(img_tmp, tuple(gate_center), 15, (16, 155, 5), 3)
 
-    pre_gate_center = gate_center
+    # Update
+    prev_gate_center = gate_center
     idx += 1
     cv2.imshow('1', img_tmp)
     cv2.waitKey(200)
