@@ -4,11 +4,11 @@ from matplotlib import pyplot as plt
 import os
 
 
-fname = os.getcwd() + '/WashingtonOBRace/WashingtonOBRace/'
+fname = os.getcwd() + '/img_gates/'
 
 img1 = cv2.imread(fname + 'img_331.png')          # queryImage
 img1 = cv2.cvtColor(img1, cv2.COLOR_BGR2GRAY)
-img2 = cv2.imread(fname + 'img_262.png') # trainImage
+img2 = cv2.imread(fname + 'img_24.png') # trainImage
 img2 = cv2.cvtColor(img2, cv2.COLOR_BGR2GRAY)
 #img1_mask = cv2.imread(fname + 'mask_413.png')
 #img1_mask = cv2.cvtColor(img1_mask, cv2.COLOR_BGR2GRAY)
@@ -32,6 +32,6 @@ matches = bf.match(des1,des2)
 matches = sorted(matches, key = lambda x:x.distance)
 
 # Draw first 10 matches.
-img4 = cv2.drawMatches(img1,kp1,img2,kp2,matches[:40], None, flags=cv2.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
+img4 = cv2.drawMatches(img1,kp1,img2,kp2,matches, None, flags=cv2.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
 
 plt.imshow(img4),plt.show()

@@ -21,17 +21,19 @@ sample_circle_step = 15
 sample_circle_radius = 30
 sample_reject_ratio = 3
 dir = os.path.join(os.getcwd(), 'img_gates')
-target = os.path.join(dir, 'img_290.png')
+target = os.path.join(dir, 'img_60.png')
 
 img_query = cv2.imread('pattern.png')          # queryImage
 img_query = cv2.cvtColor(img_query, cv2.COLOR_RGB2GRAY)
 
 img_train = cv2.imread(target) # trainImage
 img_train = cv2.cvtColor(img_train, cv2.COLOR_RGB2GRAY)
+plt.imshow(img_train, cmap='gray'), plt.show()
 mask = cv2.inRange(img_train, 210, 255)
 kernel = np.ones((8, 8), np.uint8)
+plt.imshow(mask, cmap='gray'), plt.show()
 dilation = cv2.dilate(mask, kernel, iterations=1)
-# plt.imshow(dilation, cmap='gray'), plt.show()
+plt.imshow(dilation, cmap='gray'), plt.show()
 [h, w] = img_train.shape
 
 # Initiate SIFT detector
@@ -81,21 +83,23 @@ max3_label = c[0, -3]
 max4_label = c[0, -4]
 
 img_tmp = cv2.imread(target)
-'''
+img_tmp = cv2.cvtColor(img_tmp, cv2.COLOR_BGR2GRAY)
+
+img_tmp = cv2.cvtColor(img_tmp, cv2.COLOR_GRAY2BGR)
 for pt, label in zip(pt_match, cluster_labels):
     if label == max1_label:
-        img_tmp = cv2.circle(img_tmp, tuple(pt), 3, (0, 0, 255), -1)
+        img_tmp = cv2.circle(img_tmp, tuple(pt), 3, (255, 0, 0), -1)
     elif label == max2_label:
-        img_tmp = cv2.circle(img_tmp, tuple(pt), 3, (0, 255, 0), -1)
+        img_tmp = cv2.circle(img_tmp, tuple(pt), 3, (255, 0, 0), -1)
     elif label == max3_label:
-        img_tmp = cv2.circle(img_tmp, tuple(pt), 3, (255, 90, 0), -1)
+        img_tmp = cv2.circle(img_tmp, tuple(pt), 3, (255, 0, 0), -1)
     elif label == max4_label:
-        img_tmp = cv2.circle(img_tmp, tuple(pt), 3, (65, 55, 55), -1)
+        img_tmp = cv2.circle(img_tmp, tuple(pt), 3, (255, 0, 0), -1)
     else:
         pass
 cv2.imshow('1', img_tmp)
 cv2.waitKey(0)
-'''
+
 cluster1 = []
 cluster2 = []
 cluster3 = []
@@ -120,10 +124,13 @@ avg_pt3 = [int(np.sum(cluster3[:,0])/cluster3.shape[0]), int(np.sum(cluster3[:,1
 cluster4 = np.asarray(cluster4)
 avg_pt4 = [int(np.sum(cluster4[:,0])/cluster4.shape[0]), int(np.sum(cluster4[:,1])/cluster4.shape[0])]
 print(time.time()-start)
-img_tmp = cv2.circle(img_tmp, tuple(avg_pt1), 10, (0, 55, 255), -1)
-img_tmp = cv2.circle(img_tmp, tuple(avg_pt2), 10, (65, 0, 55), -1)
-img_tmp = cv2.circle(img_tmp, tuple(avg_pt3), 10, (65, 55, 0), -1)
-img_tmp = cv2.circle(img_tmp, tuple(avg_pt4), 10, (165, 55, 55), -1)
+img_tmp = cv2.circle(img_tmp, tuple(avg_pt1), 8, (0, 255, 0), -1)
+img_tmp = cv2.circle(img_tmp, tuple(avg_pt2), 8, (0, 255, 0), -1)
+img_tmp = cv2.circle(img_tmp, tuple(avg_pt3), 8, (0, 255, 0), -1)
+img_tmp = cv2.circle(img_tmp, tuple(avg_pt4), 8, (0, 255, 0), -1)
+
+gate_center = [int((avg_pt1[0]+avg_pt2[0]+avg_pt3[0]+avg_pt4[0]) / 4), int((avg_pt1[1]+avg_pt2[1]+avg_pt3[1]+avg_pt4[1]) / 4)]
+img_tmp = cv2.circle(img_tmp, tuple(gate_center), 15, (16, 155, 5), 3)
 cv2.imshow('1', img_tmp)
 cv2.waitKey(0)
 

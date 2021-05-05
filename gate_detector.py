@@ -109,16 +109,16 @@ def gate_detector_clustering(img_path, k_knnmatch=3):
 
     img_train = cv2.imread(target)  # trainImage
     img_train = cv2.cvtColor(img_train, cv2.COLOR_RGB2GRAY)
-    mask = cv2.inRange(img_train, 210, 255)
-    kernel = np.ones((8, 8), np.uint8)
-    dilation = cv2.dilate(mask, kernel, iterations=1)
+    #mask = cv2.inRange(img_train, 210, 255)
+    #kernel = np.ones((8, 8), np.uint8)
+    #dilation = cv2.dilate(mask, kernel, iterations=1)
 
     # Initiate SIFT detector
     sift = cv2.SIFT_create()
 
     # find the keypoints and descriptors with SIFT
     kp1, des1 = sift.detectAndCompute(img_query, None)
-    kp2, des2 = sift.detectAndCompute(img_train, mask=dilation)
+    kp2, des2 = sift.detectAndCompute(img_train, mask=None)
 
     # create BFMatcher object
     bf = cv2.BFMatcher()
