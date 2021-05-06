@@ -1,6 +1,8 @@
 # RCdrone_gate_detection
 TU Delft MAV course individual assignment
 
+Please first put all images into the img_gates folder.
+
 1. Files start with 'test_xxx' were used at the beginning to study how well each approach performs.
 
 2. The final code are in main.py and gate_detector.py
