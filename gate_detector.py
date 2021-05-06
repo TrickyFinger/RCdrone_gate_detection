@@ -1,3 +1,10 @@
+# This file contains functions to be executed in the main.py
+# Function 1: gate_detector_sampling.
+#   This is the function developed by myself which uses circles to sample all the interested area
+#   to perform data clustering task. It is slow and lacking accuracy. So I abandoned it after discovering DBSCAN.
+# Function 2: gate_detector_clustering.
+#   This function uses DBSCAN to perform data clustering task. It returns the coordinates of four corners.
+
 import numpy as np
 import cv2
 from matplotlib import pyplot as plt
@@ -5,7 +12,7 @@ import os
 import collections
 from sklearn.cluster import DBSCAN
 
-
+# Compute the ratio in a binary image: (white area / total area). Total area is the size of the circle
 def white_area_ratio(mask, cx, cy, R):
     roi = mask[cy-R:cy+R, cx-R:cx+R]
     rows, cols = roi.shape
@@ -109,16 +116,17 @@ def gate_detector_clustering(img_path, k_knnmatch=3):
 
     img_train = cv2.imread(target)  # trainImage
     img_train = cv2.cvtColor(img_train, cv2.COLOR_RGB2GRAY)
-    #mask = cv2.inRange(img_train, 210, 255)
-    #kernel = np.ones((8, 8), np.uint8)
-    #dilation = cv2.dilate(mask, kernel, iterations=1)
+    # Create mask and dilate it
+    mask = cv2.inRange(img_train, 210, 255)
+    kernel = np.ones((8, 8), np.uint8)
+    dilation = cv2.dilate(mask, kernel, iterations=1)
 
     # Initiate SIFT detector
     sift = cv2.SIFT_create()
 
     # find the keypoints and descriptors with SIFT
     kp1, des1 = sift.detectAndCompute(img_query, None)
-    kp2, des2 = sift.detectAndCompute(img_train, mask=None)
+    kp2, des2 = sift.detectAndCompute(img_train, mask=dilation)
 
     # create BFMatcher object
     bf = cv2.BFMatcher()

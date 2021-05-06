@@ -1,3 +1,5 @@
+# Test how good is the result when using the pattern as template
+
 import numpy as np
 import cv2
 from matplotlib import pyplot as plt

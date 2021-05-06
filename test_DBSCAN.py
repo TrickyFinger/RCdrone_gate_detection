@@ -1,3 +1,5 @@
+# Use DBSCAN to find clusters of points
+
 import numpy as np
 import cv2
 from matplotlib import pyplot as plt

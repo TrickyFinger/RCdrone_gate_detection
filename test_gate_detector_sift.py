@@ -1,3 +1,7 @@
+# Test SIFT without mask specified in sift.detectAndCompute(img_query, None)
+# Corp the query image to get the gate template
+# The effects of ratio test is also explored
+
 import numpy as np
 import cv2
 from matplotlib import pyplot as plt
